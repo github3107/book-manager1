@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Book Manager</title>
+  </head>
+  <body style="margin-left: 10px; margin-right: 10px">
+    <h1> Book Manager, Create, Update trading books!</h1>
+    <hr/>
+    <table>
+        <tr>
+            <td>
+                    Find a book: <input type="text" id="bookFilter"> <input type="button" value="Search" onclick="searchBooks()"/>
+            </td>
+            <td>
+                    <div id="bookCount">Current book count: 0</div>
+            </td>
+        </tr>
+    </table>
+    <div id="message" style='color:blue'>
+
+    </div>     
+    
+    <hr/>
+    <div>Add a new book:</div>
+    <form id="createBookForm">
+    <table>
+        <tr>
+            <td>Book Name: </td>
+            <td><input type="text" id="newBookName"/> </td>
+        </tr>
+        
+        <tr>
+            
+            <td>Book Desc: </td>
+            <td><input type="text" id="newBookDesc"/>  </td>
+        </tr>
+        <tr>
+                <td>Book Organization: </td>
+                <td><input type="text" id="newBookOrg"/>  </td>
+        </tr>
+        <tr>
+            <td colspan="3">
+                    <input type="button" value="Crate Book" onclick="createBook()"/>
+            </td>
+        </tr>
+    </table>
+    </form>
+    <hr/>
+    <div>Create Random books:</div>
+    <div>
+        <input type="text" id="newCount"> <input type="button" value="Create Random Books" onclick="createBooks()">
+    </div>
+    
+    <hr/>
+    Book Details:
+    <div id="currentBooks">
+        <table id="table">
+            <tr>
+                <th>Book Name</th>
+                <th>Book Desc</th>
+                <th>Book Org</th>
+            </tr>
+        </table>
+    </div>
+    <script language="JavaScript">
+
+        class Book{
+            constructor(bookName, bookDesc, bookOrg){
+                this.bookName=bookName;
+                this.bookDesc=bookDesc;
+                this.bookOrg=bookOrg;
+            }     
+        }
+
+        var id = 100;
+
+        makeRequest('/books');
+        
+        function makeRequest(target){
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.onreadystatechange = function() {
+                if (xmlhttp.readyState == XMLHttpRequest.DONE) {   // XMLHttpRequest.DONE == 4
+                if (xmlhttp.status == 200) {
+                    
+                    //alert(xmlhttp.responseText);
+                    
+                    if(target=='/books'){
+                        var rowIndex=0;
+                        document.getElementById("currentBooks").innerHTML="";
+                        document.getElementById("currentBooks").innerHTML='<table id="table"> <tr> <th>Book Name</th> <th>Book Desc</th> <th>Book Org</th> </tr>  </table>';
+                        table=document.getElementById('table');
+                        JSON.parse(xmlhttp.responseText).forEach(function(value, index){
+                            var row = table.insertRow(rowIndex+1);
+                            var bookName = row.insertCell(0);
+                            var bookDesc = row.insertCell(1);
+                            var bookOrg = row.insertCell(2);
+
+                            bookName.innerHTML=value.bookName;
+                            bookDesc.innerHTML=value.bookDesc;
+                            bookOrg.innerHTML=value.bookOrg;
+                            rowIndex=rowIndex+1;
+                        });
+                        document.getElementById('bookCount').innerHTML='Current book count: '+rowIndex;
+                    }else{ 
+                        document.getElementById('message').innerHTML=xmlhttp.responseText;
+                        //setMessageTimer();    
+                        if(target=='/createBook'){
+                            //refresh the display
+                            makeRequest('/books');        
+                        }           
+                    }
+                }
+                else if (xmlhttp.status == 400) {
+                    alert('There was an error 400');
+                }
+                else {
+                    alert('something else other than 200 was returned');
+                }
+                }
+            };
+
+            if(target=='/books'){
+                xmlhttp.open("GET", target, true);
+                xmlhttp.send();
+            }else if(target=='/createBook'){
+                var b = new Book(document.getElementById("newBookName").value, 
+                            document.getElementById("newBookDesc").value, 
+                            document.getElementById("newBookOrg").value);
+                sendRequest(target, xmlhttp, b);
+            }else if(target=='/createBooks'){
+                var b = new Book("", "", "");
+                
+                b.bookName="Name"+id;
+                b.bookDesc="Desc"+id;
+                b.bookOrg="BookOrg"+id;
+                id = id+1;
+                sendRequest(target, xmlhttp, b);
+
+            }else if(target=='/searchBooks'){
+                xmlhttp.open("POST", target, true);
+                xmlhttp.send();
+            }
+        }
+
+        function sendRequest(target, xmlhttp, book){
+                xmlhttp.open("POST", target, true);
+                xmlhttp.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+                xmlhttp.send(JSON.stringify(book));
+        }
+
+        function createBook(){
+            makeRequest('/createBook');
+        }
+
+        function setMessageTimer(){
+            setTimeout(clearMessage, 2000);
+        }
+
+        function createBooks(){
+            var size = parseInt(document.getElementById("newCount").value);
+            for(var i=0; i<size; i++){
+                makeRequest('/createBooks');
+            }            
+        }
+
+        function searchBooks(){
+            makeRequest('/searchBooks');
+        }
+
+        function clearMessage(){
+            document.getElementById('message').innerHTML="";
+        }
+
+    </script>
+    <hr/>
+  </body>
+</html>
