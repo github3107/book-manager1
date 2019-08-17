@@ -20,7 +20,7 @@ app.route('/').get((req, res)=> {
 app.route('/books').get(function(req, res){
         MongoClient.connect(url, function(err, db) {
             if (err) throw err;
-            var dbo = db.db("BookDB");
+            var dbo = db.db("bookdb");
             var query = { };
             dbo.collection("books").find(query).toArray(function(err, result) {
               if (err) throw err;              
@@ -33,7 +33,7 @@ app.route('/books').get(function(req, res){
 app.route('/createBook').post((req, resp)=>{
     //req.body.bookName
     MongoClient.connect(url, function(err, db) {
-        var dbo = db.db("BookDB");
+        var dbo = db.db("bookdb");
             dbo.collection("books").insertOne(req.body, function(err, res) {
             if (err) throw err;
             console.log("1 document inserted");
@@ -48,7 +48,7 @@ app.route('/createBook').post((req, resp)=>{
 
 app.route('/createBooks').post((req, resp)=>{
     MongoClient.connect(url, function(err, db) {
-        var dbo = db.db("BookDB");
+        var dbo = db.db("bookdb");
             dbo.collection("books").insertOne(req.body, function(err, res) {
             if (err) throw err;
             console.log("1 document inserted");
