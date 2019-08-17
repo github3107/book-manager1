@@ -2,8 +2,9 @@ var express = require('express');
 var app = express();
 var MongoClient = require('mongodb').MongoClient;
 
-var SERVER_PORT = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080 
+var SERVER_PORT = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080;
 var url = process.env.MONGO_URL||'mongodb://localhost:27017';
+
 
 var path = require('path');
 
@@ -67,4 +68,5 @@ app.route('/searchBooks').post((req, res)=>{
     res.send("Hey, searched book as requested!");
 });
 
-var server = app.listen(3000, function() {});
+var server = app.listen(SERVER_PORT, function() {});
+console.log("server started ramesh! at"+SERVER_PORT);
