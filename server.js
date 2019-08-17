@@ -3,6 +3,7 @@ var app = express();
 var MongoClient = require('mongodb').MongoClient;
 
 var SERVER_PORT = process.env.PORT || process.env.OPENSHIFT_NODEJS_PORT || 8080;
+console.log("process.env.MONGO_URL=="+process.env.MONGO_URL)
 var url = process.env.MONGO_URL||'mongodb://localhost:27017';
 
 
@@ -70,3 +71,4 @@ app.route('/searchBooks').post((req, res)=>{
 
 var server = app.listen(SERVER_PORT, function() {});
 console.log("server started ramesh! at"+SERVER_PORT);
+console.log("MONGO_URL="+MONGO_URL);
